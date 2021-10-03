@@ -1,4 +1,5 @@
 use std::env;
+use regex::Regex;
 use std::{fs, io};
 use std::fs::File;
 use std::path::Path;
@@ -35,9 +36,17 @@ fn search_content(entry: String) {
     match file.read_to_string(&mut s) {
         Err(_) => print!(""),
         Ok(_) => {
-            if s.contains(&args[1]) {
+            let re = Regex::new(&args[1]).unwrap();
+            if re.is_match(&s) {
                 print!("{} contains:\n{}", display, s);
-                print!("{} have: {}", display, args[1]);
+                for cap in re.captures_iter(&s) {
+                    // for pattern in cap.iter() {
+                        //     println!("{:?}", pattern);
+                        // }
+                        for i in 0..cap.len() {
+                            println!("{} have {}", display, &cap[i]);
+                        }
+                    }
             }
         }
     }
