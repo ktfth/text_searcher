@@ -11,8 +11,5 @@ bench = false
 path = "src/main.rs"
 name = "text-searcher"
 
-[package]
-name = "text_searcher"
-
 [dependencies]
 regex = "1"
