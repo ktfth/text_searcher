@@ -1,8 +1,24 @@
 use std::env;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
 
 fn main() {
-    println!("Hello, world!");
-    for argument in env::args() {
-        println!("{}", argument);
+    let args: Vec<String> = env::args().collect();
+    if args.len() == 2 {
+        println!("{}", args[1]);
+        let path = Path::new(&args[1]);
+        let display = path.display();
+
+        let mut file = match File::open(&path) {
+            Err(why) => panic!("couldn't open {}: {}", display, why),
+            Ok(file) => file,
+        };
+
+        let mut s = String::new();
+        match file.read_to_string(&mut s) {
+            Err(why) => panic!("couldn't read {}: {}", display, why),
+            Ok(_) => print!("{} contains:\n{}", display, s),
+        }
     }
 }
