@@ -1,9 +1,9 @@
 use std::env;
 use regex::Regex;
 use std::{fs, io};
+use std::io::Read;
 use std::fs::File;
 use std::path::Path;
-use std::io::prelude::*;
 use std::path::PathBuf;
 
 fn collect_file_from_dir(dir: &Path) -> io::Result<Vec<PathBuf>> {
@@ -28,7 +28,7 @@ fn search_content(entry: String) {
     let display = path.display();
 
     let mut file = match File::open(&path) {
-        Err(why) => panic!("couldn't open {}: {}", display, why),
+        Err(_) => panic!(""),
         Ok(file) => file,
     };
 
@@ -38,15 +38,14 @@ fn search_content(entry: String) {
         Ok(_) => {
             let re = Regex::new(&args[1]).unwrap();
             if re.is_match(&s) {
-                print!("{} contains:\n{}", display, s);
-                for cap in re.captures_iter(&s) {
-                    // for pattern in cap.iter() {
-                        //     println!("{:?}", pattern);
-                        // }
-                        for i in 0..cap.len() {
-                            println!("{} have {}", display, &cap[i]);
-                        }
+                let split = s.split("\n");
+                let lines = split.collect::<Vec<&str>>();
+                println!("{}:", display);
+                for i in 0..lines.len() {
+                    if lines[i] != "" && re.is_match(&lines[i]) {
+                        println!("{}| {}", i + 1, lines[i]);
                     }
+                }
             }
         }
     }
