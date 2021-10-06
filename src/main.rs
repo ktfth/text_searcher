@@ -3,6 +3,7 @@ use regex::Regex;
 use std::{fs, io};
 use std::io::Read;
 use std::fs::File;
+use regex::RegexSet;
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -53,16 +54,19 @@ fn search(entry: String) {
 fn search_content(raw_path: String) {
     let args: Vec<String> = env::args().collect();
 
-    for arg in &args[2..] {
-        let mut current = arg.chars();
-        current.next();
-        if (arg.starts_with('!') && !raw_path.contains(current.as_str())) || raw_path.contains(arg) {
-            search(raw_path.clone());
-        }
-    }
-
     if args.len() == 2 {
         search(raw_path.clone());
+    } else if args.len() > 2 && &args[2] == "--ignore" || &args[2] == "--include" {
+        let set = RegexSet::new(&args[3..]).unwrap();
+        let matches: Vec<_> = set.matches(&raw_path).into_iter().collect();
+
+        if args[2] == "--ignore" && matches.len() == 0 {
+            search(raw_path.clone());
+        }
+
+        if args[2] == "--include" && matches.len() > 0 {
+            search(raw_path.clone());
+        }
     }
 }
 
@@ -77,5 +81,7 @@ fn main() {
                 search_content(entry_path);
             }
         }
+    } else {
+        println!("text-search [pattern-or-regexp-in-file] [--ignore|--include] [pattern-or-regexp-in-path]");
     }
 }
