@@ -22,11 +22,10 @@ fn collect_file_from_dir(dir: &Path) -> io::Result<Vec<PathBuf>> {
     Ok(result)
 }
 
-fn search_content(entry: String) {
+fn search(entry: String) {
     let args: Vec<String> = env::args().collect();
     let path = Path::new(&entry);
     let display = path.display();
-
     let mut file = match File::open(&path) {
         Err(_) => panic!(""),
         Ok(file) => file,
@@ -51,9 +50,25 @@ fn search_content(entry: String) {
     }
 }
 
-fn main() -> io::Result<()> {
+fn search_content(raw_path: String) {
     let args: Vec<String> = env::args().collect();
+
+    for arg in &args[2..] {
+        let mut current = arg.chars();
+        current.next();
+        if (arg.starts_with('!') && !raw_path.contains(current.as_str())) || raw_path.contains(arg) {
+            search(raw_path.clone());
+        }
+    }
+
     if args.len() == 2 {
+        search(raw_path.clone());
+    }
+}
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    if args.len() >= 2 {
         let current_dir = Path::new(".");
         let paths = collect_file_from_dir(current_dir);
         for path in paths {
@@ -63,6 +78,4 @@ fn main() -> io::Result<()> {
             }
         }
     }
-
-    Ok(())
 }
