@@ -56,16 +56,49 @@ fn search_content(raw_path: String) {
 
     if args.len() == 2 {
         search(raw_path.clone());
-    } else if args.len() > 2 && &args[2] == "--ignore" || &args[2] == "--include" {
-        let set = RegexSet::new(&args[3..]).unwrap();
-        let matches: Vec<_> = set.matches(&raw_path).into_iter().collect();
+    } else if args.len() > 2 {
+        if args.iter().position(|r| r == "--include") != None && args.iter().position(|r| r == "--ignore") != None {
+            let include_index = args.iter().position(|r| r == "--include").unwrap();
+            let ignore_index = args.iter().position(|r| r == "--ignore").unwrap();
+            if include_index < ignore_index {
+                let include_set = RegexSet::new(&args[include_index + 1..ignore_index]).unwrap();
+                let include_matches: Vec<_> = include_set.matches(&raw_path).into_iter().collect();
+                let ignore_set = RegexSet::new(&args[ignore_index + 1..]).unwrap();
+                let ignore_matches: Vec<_> = ignore_set.matches(&raw_path).into_iter().collect();
+                let cloned = raw_path.clone();
 
-        if args[2] == "--ignore" && matches.len() == 0 {
-            search(raw_path.clone());
-        }
+                if include_matches.len() > 0 && ignore_matches.len() == 0 {
+                    search(cloned);
+                }
+            } else if ignore_index < include_index {
+                let ignore_set = RegexSet::new(&args[ignore_index + 1..include_index]).unwrap();
+                let ignore_matches: Vec<_> = ignore_set.matches(&raw_path).into_iter().collect();
+                let include_set = RegexSet::new(&args[include_index + 1..]).unwrap();
+                let include_matches: Vec<_> = include_set.matches(&raw_path).into_iter().collect();
+                let cloned = raw_path.clone();
 
-        if args[2] == "--include" && matches.len() > 0 {
-            search(raw_path.clone());
+                if include_matches.len() > 0 && ignore_matches.len() == 0 {
+                    search(cloned);
+                }
+            }
+        } else if args.iter().position(|r| r == "--include") != None {
+            let include_index = args.iter().position(|r| r == "--include").unwrap();
+            let include_set = RegexSet::new(&args[include_index + 1..]).unwrap();
+            let include_matches: Vec<_> = include_set.matches(&raw_path).into_iter().collect();
+            let cloned = raw_path.clone();
+
+            if include_matches.len() > 0 {
+                search(cloned);
+            }
+        } else if args.iter().position(|r| r == "--ignore") != None {
+            let ignore_index = args.iter().position(|r| r == "--ignore").unwrap();
+            let ignore_set = RegexSet::new(&args[ignore_index + 1..]).unwrap();
+            let ignore_matches: Vec<_> = ignore_set.matches(&raw_path).into_iter().collect();
+            let cloned = raw_path.clone();
+
+            if ignore_matches.len() == 0 {
+                search(cloned);
+            }
         }
     }
 }
