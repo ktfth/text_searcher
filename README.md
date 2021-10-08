@@ -15,5 +15,5 @@ Install the command:
 Running:
 
 ```
-text-searcher [your-pattern-or-regex]
+text-searcher [your-pattern-or-regex] --include [your-pattern-or-regex] --ignore [your-pattern-or-regex]
 ```
