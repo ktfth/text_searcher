@@ -1,6 +1,6 @@
 [package]
 name = "text_searcher"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["Kaique da Silva <kaeyosthaeron@gmail.com>"]
 description = """
 A simple text searcher tool
