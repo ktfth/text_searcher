@@ -99,6 +99,8 @@ fn search_content(raw_path: String) {
             if ignore_matches.len() == 0 {
                 search(cloned);
             }
+        } else {
+            panic!("Unknown option");
         }
     }
 }
